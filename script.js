@@ -196,9 +196,7 @@ confirmSemButton.onclick = function () {
     newSemester.innerHTML =
       '<h2 contenteditable="true">' +
       semesterName +
-      " (" +
-      semesterType +
-      ')</h2><div class="course-box" ondrop="drop(event)" ondragover="allowDrop(event)"></div>';
+      '</h2><div class="course-box" ondrop="drop(event)" ondragover="allowDrop(event)"></div>';
 
     newSemester.appendChild(deleteSemButton);
     document.getElementById("schedule-container").appendChild(newSemester);
