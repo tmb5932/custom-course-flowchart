@@ -33,6 +33,7 @@ body {
   border-radius: 2em;
   justify-self: center;
   border: none;
+  cursor: pointer;
 }
 
 .button:hover {
@@ -69,7 +70,7 @@ body {
 }
 
 .course {
-  background-color: brown;
+  background-color: rgb(93, 93, 93);
   border-radius: 1.5em;
   min-width: 150px;
   min-height: 125px;
@@ -139,4 +140,28 @@ body {
 
 .overlay-header {
   margin-top: 20px;
+}
+
+.delete-button {
+  background-color: rgb(151, 0, 0);
+  padding: 5px 10px;
+  font-size: 15px;
+  margin-top: 10px;
+  color: antiquewhite;
+  width: 150px;
+  min-height: 40px;
+  border: none;
+  border-radius: 2em;
+  justify-self: center;
+}
+
+.delete-button:hover {
+  background-color: rgb(80, 0, 0);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 81, 115, 0.559);
+}
+
+.delete-button:active {
+  transform: translateY(1px);
+  box-shadow: none;
 }

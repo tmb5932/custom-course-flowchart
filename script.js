@@ -118,12 +118,20 @@ confirmCourseButton.onclick = function () {
       newCourse.innerHTML = "<h2>" + courseName + "<h2>";
     }
 
+    // Create a delete button for the course
+    var deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete";
+    deleteButton.className = "delete-button";
+    deleteButton.onclick = function () {
+      newCourse.remove();
+    };
+
     newCourse.setAttribute("draggable", true);
     var courseId = "course-" + uniqueId++; // Create a unique course ID
     newCourse.setAttribute("id", courseId);
     newCourse.setAttribute("restriction", semRestrictions);
     newCourse.setAttribute("ondragstart", "drag(event)");
-
+    newCourse.appendChild(deleteButton);
     const elements = document.getElementsByClassName("course-box");
     for (let i = 0; i < elements.length; i++) {
       if (checkSemesterPossible(elements.item(i).parentNode, newCourse)) {
@@ -175,6 +183,14 @@ confirmSemButton.onclick = function () {
     var newSemester = document.createElement("div");
     newSemester.className = "semester-box";
 
+    // Create a delete button for the semester
+    var deleteSemButton = document.createElement("button");
+    deleteSemButton.textContent = "Delete Semester";
+    deleteSemButton.className = "delete-button";
+    deleteSemButton.onclick = function () {
+      newSemester.remove();
+    };
+
     newSemester.setAttribute("restriction", semesterType);
 
     newSemester.innerHTML =
@@ -184,6 +200,7 @@ confirmSemButton.onclick = function () {
       semesterType +
       ')</h2><div class="course-box" ondrop="drop(event)" ondragover="allowDrop(event)"></div>';
 
+    newSemester.appendChild(deleteSemButton);
     document.getElementById("schedule-container").appendChild(newSemester);
 
     semOverlay.style.display = "none";
