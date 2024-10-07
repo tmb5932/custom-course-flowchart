@@ -94,6 +94,10 @@ closeCourseOverlayButton.onclick = function () {
 };
 
 confirmCourseButton.onclick = function () {
+  if (document.querySelector(".course-box") == null) {
+    alert("Please create a semester before adding courses.");
+    return;
+  }
   var courseName = document.getElementById("new-course-name").value;
   var semRestrictions = document.getElementById("semester-restrictions").value;
 
@@ -120,7 +124,21 @@ confirmCourseButton.onclick = function () {
     newCourse.setAttribute("restriction", semRestrictions);
     newCourse.setAttribute("ondragstart", "drag(event)");
 
-    document.querySelector(".course-box").appendChild(newCourse);
+    const elements = document.getElementsByClassName("course-box");
+    for (let i = 0; i < elements.length; i++) {
+      if (checkSemesterPossible(elements.item(i).parentNode, newCourse)) {
+        elements.item(i).appendChild(newCourse);
+        break;
+      }
+      if (i == elements.length - 1) {
+        alert(
+          "There are no semesters to match course type '" +
+            semRestrictions +
+            "'."
+        );
+      }
+    }
+    // document.querySelector(".course-box").appendChild(newCourse);
 
     courseOverlay.style.display = "none";
   }
