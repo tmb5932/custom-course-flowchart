@@ -61,7 +61,7 @@ body {
 
 .course-box {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(175px, 0.5fr));
+  grid-template-columns: repeat(auto-fit, minmax(175px, 0.25fr));
   padding: min(15px, 2%);
   justify-content: center;
   margin-top: 15px;
@@ -76,6 +76,12 @@ body {
   min-height: 125px;
   justify-content: center;
   align-content: center;
+  padding-left: 25px;
+  padding-right: 25px;
+}
+
+h2 {
+  text-align: center;
 }
 
 #new-sem-button {
@@ -84,6 +90,13 @@ body {
 
 #new-course-button {
   width: 175px;
+}
+
+.placeholder {
+  background-color: rgb(136, 136, 136);
+  border-radius: 1.5em;
+  min-width: 150px;
+  min-height: 125px;
 }
 
 .overlay {

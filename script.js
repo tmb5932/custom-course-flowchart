@@ -1,12 +1,19 @@
 // Function to allow drop
 function allowDrop(event) {
-  if (
-    event.target.classList.contains("course-box") ||
-    event.target.classList.contains("course")
-  ) {
-    event.preventDefault(); // Only allow drop if it's a valid dropzone
+  // Get the course-box or course parent element to make sure it's the correct target
+  const target = event.target.closest(".course-box, .course");
+
+  if (target) {
+    event.preventDefault(); // Allow drop on valid target or its children
+  } else {
+    if (draggedCourse != null) {
+      draggedCourse.style.visibility = "visible";
+    }
   }
 }
+
+var placeholder = null; // Placeholder element
+var draggedCourse = null; // Reference to the currently dragged course
 
 function checkSemesterPossible(semester, course) {
   var courseRes = course.getAttribute("restriction");
@@ -24,8 +31,30 @@ function checkSemesterPossible(semester, course) {
 // Function to handle the drop of the course
 function drop(event) {
   event.preventDefault();
+
+  // Find the closest course or course-box element
+  const target = event.target.closest(".course-box, .course");
+
+  if (!target) {
+    return; // If no valid target is found, exit the function
+  } else {
+    if (draggedCourse != null) {
+      draggedCourse.style.visibility = "visible";
+    }
+  }
+
   var draggedCourseId = event.dataTransfer.getData("text");
-  var draggedCourse = document.getElementById(draggedCourseId);
+  draggedCourse = document.getElementById(draggedCourseId);
+
+  if (placeholder && placeholder.parentNode) {
+    placeholder.parentNode.replaceChild(draggedCourse, placeholder);
+  }
+
+  // Make the dragged course visible again after drop
+  draggedCourse.style.visibility = "visible";
+
+  // Clean up the placeholder
+  placeholder = null;
 
   // Check if the drop target is a course or a course-box
   if (event.target.classList.contains("course-box")) {
@@ -69,10 +98,59 @@ function drop(event) {
   }
 }
 
-function drag(event) {
-  event.dataTransfer.setData("text", event.target.id);
+// Function to handle if dragged course is not dropped or is canceled
+function dragEnd(event) {
+  if (draggedCourse) {
+    draggedCourse.style.visibility = "visible"; // Ensure course reappears if dragging is canceled
+  }
+  if (placeholder && placeholder.parentNode) {
+    placeholder.remove(); // Remove placeholder if drop is canceled
+  }
+  placeholder = null;
 }
 
+// Function to handle the drag start
+function drag(event) {
+  draggedCourse = event.target;
+  event.dataTransfer.setData("text", draggedCourse.id);
+
+  // Hide the dragged course while it's being dragged
+  setTimeout(() => {
+    draggedCourse.style.visibility = "hidden";
+  }, 0); // Set timeout to hide the course after drag starts
+
+  // Create a placeholder when dragging starts
+  placeholder = document.createElement("div");
+  placeholder.className = "placeholder";
+}
+
+// Function to handle the drag over event
+function dragOverCourse(event) {
+  event.preventDefault();
+
+  const targetCourse = event.target;
+  if (!targetCourse.classList.contains("course")) return; // Ensure only "course" elements are targeted
+
+  const targetRect = targetCourse.getBoundingClientRect();
+  const dropPositionX = event.clientX;
+
+  // Check whether to insert the placeholder before or after the target course
+  const courseBox = targetCourse.parentNode;
+  if (dropPositionX < targetRect.left + targetRect.width / 2) {
+    if (courseBox.firstChild !== placeholder) {
+      courseBox.insertBefore(placeholder, targetCourse);
+    }
+  } else {
+    if (targetCourse.nextSibling !== placeholder) {
+      courseBox.insertBefore(placeholder, targetCourse.nextSibling);
+    }
+  }
+}
+
+// Attach the dragEnd event to courses to handle when dragging ends
+document.querySelectorAll(".course").forEach((course) => {
+  course.addEventListener("dragend", dragEnd);
+});
 // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
 // Add Course Section
@@ -196,7 +274,7 @@ confirmSemButton.onclick = function () {
     newSemester.innerHTML =
       '<h2 contenteditable="true">' +
       semesterName +
-      '</h2><div class="course-box" ondrop="drop(event)" ondragover="allowDrop(event)"></div>';
+      '</h2><div class="course-box" ondrop="drop(event)" ondragover="allowDrop(event); dragOverCourse(event)"></div>';
 
     newSemester.appendChild(deleteSemButton);
     document.getElementById("schedule-container").appendChild(newSemester);
