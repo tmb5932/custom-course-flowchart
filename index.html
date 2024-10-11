@@ -13,12 +13,26 @@
     <!-- NOT IMPLEMENTED HELP OVERLAY YET!!!!!-->
 
     <!-- PLAN TO DO!!! -->
-    <!-- SCRAPE DATA ABOUT COURSES FROM THE https://schedulemaker.csh.rit.edu/browse webpage!-->
-    <!-- ADD BUTTONS TO CHANGE SCALE OF EVERYTHING (SMALL, NORMAL, LARGE). SO PEOPLE CAN SEE LIKE 6 SEMESTERS AT SAME TIME INSTEAD OF ONLY 2-->
-    <!-- OR ADD A VIEW BUTTON THAT CONDENSES THE INFO INTO SOMETHING LIKE THE RIT GIVEN PDF's-->
+    <!-- SCRAPE DATA ABOUT COURSES FROM THE https://schedulemaker.csh.rit.edu/browse webpage! -->
+    <!-- ADD BUTTONS TO CHANGE SCALE OF EVERYTHING (SMALL, NORMAL, LARGE). SO PEOPLE CAN SEE LIKE 6 SEMESTERS AT SAME TIME INSTEAD OF ONLY 2 -->
+    <!-- OR ADD A VIEW BUTTON THAT CONDENSES THE INFO INTO SOMETHING LIKE THE RIT GIVEN PDF's -->
+    <!-- Move the create semester and create course buttons to a nav bar that is always on screen -->
+    <!-- Add option to choose color of semester/course when creating it -->
 
     <!-- Semesters -->
-    <div id="schedule-container"></div>
+    <div id="schedule-container">
+      <div class="semester-box" restriction="Fall">
+        <h2 contenteditable="true">Fall 2024</h2>
+        <div
+          class="course-box"
+          ondrop="drop(event)"
+          ondragover="allowDrop(event); dragOverCourse(event)"
+        ></div>
+        <button class="delete-button" onclick="this.parentNode.remove()">
+          Delete Semester
+        </button>
+      </div>
+    </div>
 
     <!-- Add New Course -->
     <button class="button" id="new-course-button">Add New Course</button>
