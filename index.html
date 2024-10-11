@@ -6,7 +6,7 @@
     <title>My Custom Course Flowchart</title>
     <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
-  <body>
+  <body ondragover="allowDrop(event)">
     <h1 id="title">Custom Course Flowchart Maker</h1>
     <!-- How to Use -->
     <button class="button" id="help-button">How to Use</button>
@@ -63,6 +63,8 @@
           id="new-semester-name"
           class="new-name-input"
           placeholder="Enter semester name"
+          autofocus
+          ;
         />
         <h3 class="overlay-header">Type</h3>
         <select id="semester-type" class="dropdown-menu">

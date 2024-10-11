@@ -1,13 +1,20 @@
+var draggedOff = false;
+
 // Function to allow drop
 function allowDrop(event) {
+  draggedCourse.style.visibility = "hidden";
+  if (placeholder === null && draggedOff) {
+    placeholder = document.createElement("div");
+    placeholder.className = "placeholder";
+  }
   // Get the course-box or course parent element to make sure it's the correct target
   const target = event.target.closest(".course-box, .course");
 
   if (target) {
     event.preventDefault(); // Allow drop on valid target or its children
   } else {
-    if (draggedCourse != null) {
-      draggedCourse.style.visibility = "visible";
+    if (placeholder != null) {
+      draggedOff = true;
     }
   }
 }
@@ -17,7 +24,6 @@ var draggedCourse = null; // Reference to the currently dragged course
 
 function checkSemesterPossible(semester, course) {
   var courseRes = course.getAttribute("restriction");
-
   if (
     courseRes === "Any" ||
     courseRes === semester.getAttribute("restriction") + " Only"
@@ -36,11 +42,12 @@ function drop(event) {
   const target = event.target.closest(".course-box, .course");
 
   if (!target) {
-    return; // If no valid target is found, exit the function
-  } else {
-    if (draggedCourse != null) {
-      draggedCourse.style.visibility = "visible";
+    draggedCourse.style.visibility = "visible";
+    if (placeholder != null) {
+      placeholder.remove;
+      placeholder = null;
     }
+    return; // If no valid target is found, exit the function
   }
 
   var draggedCourseId = event.dataTransfer.getData("text");
@@ -52,10 +59,11 @@ function drop(event) {
 
   // Make the dragged course visible again after drop
   draggedCourse.style.visibility = "visible";
-
+  if (placeholder != null) {
+    placeholder.remove;
+    placeholder = null;
+  }
   // Clean up the placeholder
-  placeholder = null;
-
   // Check if the drop target is a course or a course-box
   if (event.target.classList.contains("course-box")) {
     if (checkSemesterPossible(event.target.parentNode, draggedCourse)) {
@@ -103,9 +111,8 @@ function dragEnd(event) {
   if (draggedCourse) {
     draggedCourse.style.visibility = "visible"; // Ensure course reappears if dragging is canceled
   }
-  if (placeholder && placeholder.parentNode) {
-    placeholder.remove(); // Remove placeholder if drop is canceled
-  }
+
+  removePlaceholdersFromCourseBox();
   placeholder = null;
 }
 
@@ -113,11 +120,10 @@ function dragEnd(event) {
 function drag(event) {
   draggedCourse = event.target;
   event.dataTransfer.setData("text", draggedCourse.id);
-
   // Hide the dragged course while it's being dragged
   setTimeout(() => {
     draggedCourse.style.visibility = "hidden";
-  }, 0); // Set timeout to hide the course after drag starts
+  }, 1); // Set timeout to hide the course after drag starts
 
   // Create a placeholder when dragging starts
   placeholder = document.createElement("div");
@@ -129,8 +135,9 @@ function dragOverCourse(event) {
   event.preventDefault();
 
   const targetCourse = event.target;
-  if (!targetCourse.classList.contains("course")) return; // Ensure only "course" elements are targeted
-
+  if (!targetCourse.classList.contains("course")) {
+    return;
+  } // Ensure only "course" elements are targeted
   const targetRect = targetCourse.getBoundingClientRect();
   const dropPositionX = event.clientX;
 
@@ -147,10 +154,28 @@ function dragOverCourse(event) {
   }
 }
 
+function removePlaceholdersFromCourseBox() {
+  // Get all elements with class 'course-box'
+  const courseBoxes = document.querySelectorAll(".course-box");
+
+  // Loop through each course-box
+  courseBoxes.forEach((courseBox) => {
+    // Convert HTMLCollection (children) to an array for safe iteration
+    Array.from(courseBox.children).forEach((child) => {
+      // Check if the child has the class 'placeholder'
+      if (child.classList.contains("placeholder")) {
+        child.remove(); // Remove the child if it has the 'placeholder' class
+      }
+    });
+  });
+}
 // Attach the dragEnd event to courses to handle when dragging ends
-document.querySelectorAll(".course").forEach((course) => {
-  course.addEventListener("dragend", dragEnd);
-});
+function attachDragEndListeners() {
+  document.querySelectorAll(".course").forEach((course) => {
+    course.addEventListener("dragend", dragEnd);
+  });
+}
+
 // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
 // Add Course Section
@@ -165,6 +190,9 @@ newCourseButton.onclick = function () {
   courseOverlay.style.display = "flex";
   document.getElementById("new-course-name").value = ""; // Reset to empty
   document.getElementById("semester-restrictions").value = "Any"; // Reset to default
+
+  // Focus on the input field
+  document.getElementById("new-course-name").focus();
 };
 
 closeCourseOverlayButton.onclick = function () {
@@ -214,6 +242,7 @@ confirmCourseButton.onclick = function () {
     for (let i = 0; i < elements.length; i++) {
       if (checkSemesterPossible(elements.item(i).parentNode, newCourse)) {
         elements.item(i).appendChild(newCourse);
+        attachDragEndListeners();
         break;
       }
       if (i == elements.length - 1) {
@@ -242,6 +271,9 @@ newSemButton.onclick = function () {
   semOverlay.style.display = "flex";
   document.getElementById("new-semester-name").value = ""; // Reset to empty
   document.getElementById("semester-type").value = "Fall"; // Reset to default
+
+  // Focus on the input field
+  document.getElementById("new-semester-name").focus();
 };
 
 closeSemOverlayButton.onclick = function () {
