@@ -371,6 +371,9 @@ document
     document
       .querySelectorAll(".delete-button")
       .forEach((btn) => btn.classList.add("hidden-in-pdf"));
+    document
+      .querySelectorAll(".lock-button")
+      .forEach((btn) => btn.classList.add("hidden-in-pdf"));
 
     const container = document.getElementById("schedule-container");
 
@@ -515,5 +518,6 @@ function unlockSemester(button) {
   const semesterBox = button.parentNode;
   semesterBox.classList.remove("locked");
   button.textContent = "Lock";
+  button.color = "rgba(255, 0, 0, 0.3)";
   button.setAttribute("onclick", "lockSemester(this)");
 }
