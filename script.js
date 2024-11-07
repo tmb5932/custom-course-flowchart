@@ -226,6 +226,7 @@ confirmCourseButton.onclick = function () {
     var newCourse = document.createElement("div");
     newCourse.className = "course";
     newCourse.textContent = courseName;
+    newCourse.style.backgroundColor = courseColor; // Set color
 
     if (semRestrictions !== "Any") {
       newCourse.innerHTML =
@@ -233,9 +234,6 @@ confirmCourseButton.onclick = function () {
     } else {
       newCourse.innerHTML = "<h2>" + courseName + "<h2>";
     }
-
-    // Set color
-    newCourse.style.backgroundColor = courseColor;
 
     // Create a delete button for the course
     var deleteButton = document.createElement("button");
@@ -251,22 +249,25 @@ confirmCourseButton.onclick = function () {
     newCourse.setAttribute("restriction", semRestrictions);
     newCourse.setAttribute("ondragstart", "drag(event)");
     newCourse.appendChild(deleteButton);
+
+    var found = false;
     const elements = document.getElementsByClassName("course-box");
     for (let i = 0; i < elements.length; i++) {
-      if (checkSemesterPossible(elements.item(i).parentNode, newCourse)) {
+      const parentSemester = elements.item(i).parentNode;
+      if (
+        !parentSemester.classList.contains("locked") &&
+        checkSemesterPossible(elements.item(i).parentNode, newCourse)
+      ) {
         elements.item(i).appendChild(newCourse);
         attachDragEndListeners();
+        found = true;
         break;
       }
-      if (i == elements.length - 1) {
-        alert(
-          "There are no semesters to match course type '" +
-            semRestrictions +
-            "'."
-        );
-      }
     }
-    // document.querySelector(".course-box").appendChild(newCourse);
+
+    if (!found) {
+      alert("No available unlocked semester matches the course type.");
+    }
 
     courseOverlay.style.display = "none";
   }
@@ -326,6 +327,13 @@ confirmSemButton.onclick = function () {
       newSemester.remove();
     };
 
+    var lockSemButton = document.createElement("button");
+    lockSemButton.textContent = "Lock";
+    lockSemButton.className = "lock-button";
+    lockSemButton.onclick = function () {
+      lockSemester(this);
+    };
+
     newSemester.setAttribute("restriction", semesterType);
 
     newSemester.innerHTML =
@@ -334,6 +342,7 @@ confirmSemButton.onclick = function () {
       '</h2><div class="course-box" ondrop="drop(event)" ondragover="allowDrop(event); dragOverCourse(event)"></div>';
 
     newSemester.appendChild(deleteSemButton);
+    newSemester.appendChild(lockSemButton);
     document.getElementById("schedule-container").appendChild(newSemester);
 
     semOverlay.style.display = "none";
@@ -354,131 +363,6 @@ function updateColorPreview(colorSelectorId, previewId) {
   const previewElement = document.getElementById(previewId);
   previewElement.style.backgroundColor = colorValue;
 }
-
-// document
-//   .getElementById("download-pdf-button")
-//   .addEventListener("click", function () {
-//     // Hide delete buttons
-//     document
-//       .querySelectorAll(".delete-button")
-//       .forEach((btn) => btn.classList.add("hidden-in-pdf"));
-
-//     const container = document.getElementById("schedule-container");
-
-//     html2canvas(container, {
-//       scale: 2,
-//     }).then((canvas) => {
-//       const imgData = canvas.toDataURL("image/png");
-//       const pdf = new jspdf.jsPDF("p", "mm", "a4");
-
-//       // PDF dimensions
-//       const pdfWidth = pdf.internal.pageSize.getWidth();
-//       const pdfHeight = pdf.internal.pageSize.getHeight();
-
-//       // Image dimensions
-//       const imgWidth = pdfWidth - 20; // Add padding
-//       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-//       let position = 25; // Space for title and date
-//       const pageHeight = pdfHeight - 30; // Adjust for title and padding
-
-//       // Title with date
-//       const title = "Custom Flow Chart";
-//       const date = new Date().toLocaleDateString();
-//       pdf.setFontSize(16);
-//       pdf.text(title, pdfWidth / 2, 10, { align: "center" });
-//       pdf.setFontSize(12);
-//       pdf.text(`Date: ${date}`, pdfWidth / 2, 18, { align: "center" });
-
-//       for (let offset = 0; offset < imgHeight; offset += pageHeight) {
-//         if (offset > 0) pdf.addPage();
-//         pdf.addImage(
-//           imgData,
-//           "PNG",
-//           10,
-//           position - offset,
-//           imgWidth,
-//           imgHeight
-//         );
-//       }
-
-//       pdf.save("Custom-Course-Flowchart.pdf");
-
-//       // After generating the PDF reshow delete buttons
-//       document
-//         .querySelectorAll(".delete-button")
-//         .forEach((btn) => btn.classList.remove("hidden-in-pdf"));
-//     });
-//   });
-
-// THIS ONE PUTS EVERYTHING ON 1 PAGE, WHICH ISNT TERRIBLE
-// document
-//   .getElementById("download-pdf-button")
-//   .addEventListener("click", function () {
-//     // Hide delete buttons
-//     document
-//       .querySelectorAll(".delete-button")
-//       .forEach((btn) => btn.classList.add("hidden-in-pdf"));
-
-//     const container = document.getElementById("schedule-container");
-
-//     html2canvas(container, {
-//       scale: 2, // High resolution for better quality
-//     }).then((canvas) => {
-//       const imgData = canvas.toDataURL("image/png");
-//       const pdf = new jspdf.jsPDF("p", "mm", "a4");
-
-//       // PDF dimensions
-//       const pdfWidth = pdf.internal.pageSize.getWidth();
-//       const pdfHeight = pdf.internal.pageSize.getHeight();
-
-//       // Image dimensions
-//       const imgWidth = pdfWidth - 20; // Add padding
-//       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-//       const headerHeight = 25; // Reserve space for title and date
-//       const usablePageHeight = pdfHeight - 30; // Adjust usable content space
-
-//       // Add title and date on the first page
-//       const title = "Custom Flow Chart";
-//       const date = new Date().toLocaleDateString();
-//       pdf.setFontSize(16);
-//       pdf.text(title, pdfWidth / 2, 10, { align: "center" });
-//       pdf.setFontSize(12);
-//       pdf.text(`Date: ${date}`, pdfWidth / 2, 18, { align: "center" });
-
-//       let currentOffset = 0;
-
-//       while (currentOffset < imgHeight) {
-//         if (currentOffset > 0) {
-//           pdf.addPage();
-//         }
-
-//         const renderHeight = Math.min(
-//           usablePageHeight,
-//           imgHeight - currentOffset
-//         );
-
-//         pdf.addImage(
-//           imgData,
-//           "PNG",
-//           10,
-//           currentOffset === 0 ? headerHeight : 10, // First page has header
-//           imgWidth,
-//           renderHeight
-//         );
-
-//         currentOffset += renderHeight;
-//       }
-
-//       pdf.save("Custom-Course-Flowchart.pdf");
-
-//       // Re-show delete buttons
-//       document
-//         .querySelectorAll(".delete-button")
-//         .forEach((btn) => btn.classList.remove("hidden-in-pdf"));
-//     });
-//   });
 
 document
   .getElementById("download-pdf-button")
@@ -525,7 +409,13 @@ document
         scaledImgHeight
       );
 
-      pdf.save("Custom-Course-Flowchart.pdf");
+      // Open the PDF in a new tab
+      const pdfBlob = pdf.output("blob");
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      window.open(pdfUrl, "_blank");
+
+      // Insta save, no open
+      // pdf.save("Custom-Course-Flowchart.pdf");
 
       // Re-show delete buttons
       document
@@ -612,4 +502,18 @@ function loadFlowchart() {
   });
 
   alert("Flowchart loaded successfully!");
+}
+
+function lockSemester(button) {
+  const semesterBox = button.parentNode;
+  semesterBox.classList.add("locked");
+  button.textContent = "Unlock";
+  button.setAttribute("onclick", "unlockSemester(this)");
+}
+
+function unlockSemester(button) {
+  const semesterBox = button.parentNode;
+  semesterBox.classList.remove("locked");
+  button.textContent = "Lock";
+  button.setAttribute("onclick", "lockSemester(this)");
 }
