@@ -258,3 +258,34 @@ h2 {
   margin-top: 5px;
   display: none;
 }
+.lock-button {
+  background-color: rgb(75, 75, 75);
+  color: white;
+  font-size: 15px;
+  width: 150px;
+  min-height: 40px;
+  border-radius: 2em;
+  justify-self: center;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.lock-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.5);
+}
+
+.lock-button:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.semester-box.locked .lock-button {
+  background-color: rgb(75, 75, 75);
+}
+
+.semester-box:not(.locked) .lock-button {
+  background-color: rgba(75, 75, 75, 0.5);
+}
