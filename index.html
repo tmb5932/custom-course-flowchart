@@ -12,11 +12,6 @@
     <button class="button" id="help-button">How to Use</button>
     <!-- NOT IMPLEMENTED HELP OVERLAY YET!!!!!-->
 
-    <!-- PLAN TO DO!!! -->
-    <!-- ADD A VIEW BUTTON THAT CONDENSES THE INFO INTO SOMETHING LIKE THE RIT GIVEN PDF's -->
-    <!-- Move the create semester and create course buttons to a nav bar that is always on screen -->
-    <!-- Add option to choose color of semester/course when creating it -->
-
     <!-- Semesters -->
     <div id="schedule-container">
       <div class="semester-box" restriction="Fall">
@@ -32,8 +27,12 @@
       </div>
     </div>
 
-    <!-- Add New Course -->
-    <button class="button" id="new-course-button">Add New Course</button>
+    <!-- NAV BAR -->
+    <div id="nav-buttons">
+      <button class="button" id="new-sem-button">Add New Semester</button>
+      <button class="button" id="new-course-button">Add New Course</button>
+      <button class="button" id="download-pdf-button">Download as PDF</button>
+    </div>
 
     <!-- Overlay for adding a new course -->
     <div id="course-overlay" class="overlay">
@@ -48,6 +47,7 @@
           autocomplete="off"
           placeholder="Enter course name"
         />
+        <p id="course-name-error" class="error-message"></p>
         <h3 class="overlay-header">Restrictions</h3>
         <select id="semester-restrictions" class="dropdown-menu">
           <option value="Any">No Restrictions</option>
@@ -78,9 +78,6 @@
       </div>
     </div>
 
-    <!-- Add New Semester -->
-    <button class="button" id="new-sem-button">Add New Semester</button>
-
     <!-- Overlay for adding a new semester -->
     <div id="semester-overlay" class="overlay">
       <div class="overlay-content">
@@ -91,10 +88,11 @@
           type="text"
           id="new-semester-name"
           class="new-name-input"
+          autocomplete="off"
           placeholder="Enter semester name"
           autofocus
-          ;
         />
+        <p id="semester-name-error" class="error-message"></p>
         <h3 class="overlay-header">Type</h3>
         <select id="semester-type" class="dropdown-menu">
           <option value="Fall">Fall</option>
@@ -107,5 +105,7 @@
     </div>
 
     <script type="text/javascript" src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   </body>
 </html>
