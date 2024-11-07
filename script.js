@@ -355,6 +355,131 @@ function updateColorPreview(colorSelectorId, previewId) {
   previewElement.style.backgroundColor = colorValue;
 }
 
+// document
+//   .getElementById("download-pdf-button")
+//   .addEventListener("click", function () {
+//     // Hide delete buttons
+//     document
+//       .querySelectorAll(".delete-button")
+//       .forEach((btn) => btn.classList.add("hidden-in-pdf"));
+
+//     const container = document.getElementById("schedule-container");
+
+//     html2canvas(container, {
+//       scale: 2,
+//     }).then((canvas) => {
+//       const imgData = canvas.toDataURL("image/png");
+//       const pdf = new jspdf.jsPDF("p", "mm", "a4");
+
+//       // PDF dimensions
+//       const pdfWidth = pdf.internal.pageSize.getWidth();
+//       const pdfHeight = pdf.internal.pageSize.getHeight();
+
+//       // Image dimensions
+//       const imgWidth = pdfWidth - 20; // Add padding
+//       const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+//       let position = 25; // Space for title and date
+//       const pageHeight = pdfHeight - 30; // Adjust for title and padding
+
+//       // Title with date
+//       const title = "Custom Flow Chart";
+//       const date = new Date().toLocaleDateString();
+//       pdf.setFontSize(16);
+//       pdf.text(title, pdfWidth / 2, 10, { align: "center" });
+//       pdf.setFontSize(12);
+//       pdf.text(`Date: ${date}`, pdfWidth / 2, 18, { align: "center" });
+
+//       for (let offset = 0; offset < imgHeight; offset += pageHeight) {
+//         if (offset > 0) pdf.addPage();
+//         pdf.addImage(
+//           imgData,
+//           "PNG",
+//           10,
+//           position - offset,
+//           imgWidth,
+//           imgHeight
+//         );
+//       }
+
+//       pdf.save("Custom-Course-Flowchart.pdf");
+
+//       // After generating the PDF reshow delete buttons
+//       document
+//         .querySelectorAll(".delete-button")
+//         .forEach((btn) => btn.classList.remove("hidden-in-pdf"));
+//     });
+//   });
+
+// THIS ONE PUTS EVERYTHING ON 1 PAGE, WHICH ISNT TERRIBLE
+// document
+//   .getElementById("download-pdf-button")
+//   .addEventListener("click", function () {
+//     // Hide delete buttons
+//     document
+//       .querySelectorAll(".delete-button")
+//       .forEach((btn) => btn.classList.add("hidden-in-pdf"));
+
+//     const container = document.getElementById("schedule-container");
+
+//     html2canvas(container, {
+//       scale: 2, // High resolution for better quality
+//     }).then((canvas) => {
+//       const imgData = canvas.toDataURL("image/png");
+//       const pdf = new jspdf.jsPDF("p", "mm", "a4");
+
+//       // PDF dimensions
+//       const pdfWidth = pdf.internal.pageSize.getWidth();
+//       const pdfHeight = pdf.internal.pageSize.getHeight();
+
+//       // Image dimensions
+//       const imgWidth = pdfWidth - 20; // Add padding
+//       const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+//       const headerHeight = 25; // Reserve space for title and date
+//       const usablePageHeight = pdfHeight - 30; // Adjust usable content space
+
+//       // Add title and date on the first page
+//       const title = "Custom Flow Chart";
+//       const date = new Date().toLocaleDateString();
+//       pdf.setFontSize(16);
+//       pdf.text(title, pdfWidth / 2, 10, { align: "center" });
+//       pdf.setFontSize(12);
+//       pdf.text(`Date: ${date}`, pdfWidth / 2, 18, { align: "center" });
+
+//       let currentOffset = 0;
+
+//       while (currentOffset < imgHeight) {
+//         if (currentOffset > 0) {
+//           pdf.addPage();
+//         }
+
+//         const renderHeight = Math.min(
+//           usablePageHeight,
+//           imgHeight - currentOffset
+//         );
+
+//         pdf.addImage(
+//           imgData,
+//           "PNG",
+//           10,
+//           currentOffset === 0 ? headerHeight : 10, // First page has header
+//           imgWidth,
+//           renderHeight
+//         );
+
+//         currentOffset += renderHeight;
+//       }
+
+//       pdf.save("Custom-Course-Flowchart.pdf");
+
+//       // Re-show delete buttons
+//       document
+//         .querySelectorAll(".delete-button")
+//         .forEach((btn) => btn.classList.remove("hidden-in-pdf"));
+//     });
+//   });
+
 document
   .getElementById("download-pdf-button")
   .addEventListener("click", function () {
@@ -366,7 +491,7 @@ document
     const container = document.getElementById("schedule-container");
 
     html2canvas(container, {
-      scale: 2,
+      scale: 2, // High resolution for better quality
     }).then((canvas) => {
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jspdf.jsPDF("p", "mm", "a4");
@@ -375,14 +500,14 @@ document
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
 
-      // Image dimensions
-      const imgWidth = pdfWidth - 20; // Add padding
+      const imgWidth = pdfWidth - 20; // Add padding of 10mm on both sides
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-      let position = 25; // Space for title and date
-      const pageHeight = pdfHeight - 30; // Adjust for title and padding
+      // Scale content to fit within the first page height if it's larger
+      const scaledImgHeight =
+        imgHeight > pdfHeight - 40 ? pdfHeight - 40 : imgHeight;
 
-      // Title with date
+      // Add title and date
       const title = "Custom Flow Chart";
       const date = new Date().toLocaleDateString();
       pdf.setFontSize(16);
@@ -390,21 +515,19 @@ document
       pdf.setFontSize(12);
       pdf.text(`Date: ${date}`, pdfWidth / 2, 18, { align: "center" });
 
-      for (let offset = 0; offset < imgHeight; offset += pageHeight) {
-        if (offset > 0) pdf.addPage();
-        pdf.addImage(
-          imgData,
-          "PNG",
-          10,
-          position - offset,
-          imgWidth,
-          imgHeight
-        );
-      }
+      // Add image content (scaled appropriately)
+      pdf.addImage(
+        imgData,
+        "PNG",
+        10,
+        25, // Below title
+        imgWidth,
+        scaledImgHeight
+      );
 
       pdf.save("Custom-Course-Flowchart.pdf");
 
-      // After generating the PDF reshow delete buttons
+      // Re-show delete buttons
       document
         .querySelectorAll(".delete-button")
         .forEach((btn) => btn.classList.remove("hidden-in-pdf"));
