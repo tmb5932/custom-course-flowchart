@@ -410,3 +410,83 @@ document
         .forEach((btn) => btn.classList.remove("hidden-in-pdf"));
     });
   });
+
+// Saves the current flowchart to local storage
+function saveFlowchart() {
+  const semesters = [];
+  document.querySelectorAll(".semester-box").forEach((semester) => {
+    const semesterName = semester.querySelector("h2").textContent.trim();
+    const semesterType = semester.getAttribute("restriction");
+    const courses = [];
+
+    semester.querySelectorAll(".course").forEach((course) => {
+      courses.push({
+        name: course.querySelector("h2").textContent.trim(),
+        restriction: course.getAttribute("restriction"),
+        color: course.style.backgroundColor,
+      });
+    });
+
+    semesters.push({ name: semesterName, type: semesterType, courses });
+  });
+
+  localStorage.setItem("flowchartData", JSON.stringify(semesters));
+  alert("Flowchart saved successfully!");
+}
+
+// Loads saved flowchart from local storage
+function loadFlowchart() {
+  const savedData = localStorage.getItem("flowchartData");
+  if (!savedData) {
+    alert("No saved flowchart found!");
+    return;
+  }
+
+  const semesters = JSON.parse(savedData);
+  const scheduleContainer = document.getElementById("schedule-container");
+  scheduleContainer.innerHTML = ""; // Clears current schedule
+
+  semesters.forEach((semesterData) => {
+    const newSemester = document.createElement("div");
+    newSemester.className = "semester-box";
+    newSemester.setAttribute("restriction", semesterData.type);
+
+    newSemester.innerHTML =
+      `<h2 contenteditable="true">${semesterData.name}</h2>` +
+      `<div class="course-box" ondrop="drop(event)" ondragover="allowDrop(event); dragOverCourse(event)"></div>`;
+
+    const courseBox = newSemester.querySelector(".course-box");
+
+    semesterData.courses.forEach((courseData) => {
+      const newCourse = document.createElement("div");
+      newCourse.className = "course";
+      newCourse.innerHTML = `<h2>${courseData.name}</h2>`;
+      newCourse.style.backgroundColor = courseData.color;
+      newCourse.setAttribute("restriction", courseData.restriction);
+      newCourse.setAttribute("draggable", true);
+      newCourse.setAttribute("ondragstart", "drag(event)");
+
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "Delete";
+      deleteButton.className = "delete-button";
+      deleteButton.onclick = function () {
+        newCourse.remove();
+      };
+
+      newCourse.appendChild(deleteButton);
+      courseBox.appendChild(newCourse);
+    });
+
+    const deleteSemButton = document.createElement("button");
+    deleteSemButton.textContent = "Delete Semester";
+    deleteSemButton.className = "delete-button";
+    deleteSemButton.onclick = function () {
+      newSemester.remove();
+    };
+
+    newSemester.appendChild(deleteSemButton);
+    scheduleContainer.appendChild(newSemester);
+  });
+
+  alert("Flowchart loaded successfully!");
+}
