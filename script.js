@@ -207,6 +207,16 @@ confirmCourseButton.onclick = function () {
   var semRestrictions = document.getElementById("semester-restrictions").value;
   var courseColor = document.getElementById("course-color").value;
 
+  const courseNameError = document.getElementById("course-name-error");
+
+  if (courseName === "" || (courseName != null && courseName.trim() == "")) {
+    courseNameError.textContent = "A course name is required.";
+    courseNameError.style.display = "block"; // Show Error
+    return;
+  }
+
+  courseNameError.style.display = "none"; // Hide error
+
   // Only create a new semester if the user enters a valid name and selects a type
   if (
     courseName !== null &&
@@ -286,6 +296,18 @@ closeSemOverlayButton.onclick = function () {
 confirmSemButton.onclick = function () {
   var semesterName = document.getElementById("new-semester-name").value;
   var semesterType = document.getElementById("semester-type").value;
+  const semesterNameError = document.getElementById("semester-name-error");
+
+  if (
+    semesterName === "" ||
+    (semesterName != null && semesterName.trim() == "")
+  ) {
+    semesterNameError.textContent = "A semester name is required.";
+    semesterNameError.style.display = "block"; // Show error
+    return;
+  }
+
+  semesterNameError.style.display = "none"; // Hide error
 
   // Only create a new semester if the user enters a valid name and selects a type
   if (
@@ -332,3 +354,59 @@ function updateColorPreview(colorSelectorId, previewId) {
   const previewElement = document.getElementById(previewId);
   previewElement.style.backgroundColor = colorValue;
 }
+
+document
+  .getElementById("download-pdf-button")
+  .addEventListener("click", function () {
+    // Hide delete buttons
+    document
+      .querySelectorAll(".delete-button")
+      .forEach((btn) => btn.classList.add("hidden-in-pdf"));
+
+    const container = document.getElementById("schedule-container");
+
+    html2canvas(container, {
+      scale: 2,
+    }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jspdf.jsPDF("p", "mm", "a4");
+
+      // PDF dimensions
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      // Image dimensions
+      const imgWidth = pdfWidth - 20; // Add padding
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      let position = 25; // Space for title and date
+      const pageHeight = pdfHeight - 30; // Adjust for title and padding
+
+      // Title with date
+      const title = "Custom Flow Chart";
+      const date = new Date().toLocaleDateString();
+      pdf.setFontSize(16);
+      pdf.text(title, pdfWidth / 2, 10, { align: "center" });
+      pdf.setFontSize(12);
+      pdf.text(`Date: ${date}`, pdfWidth / 2, 18, { align: "center" });
+
+      for (let offset = 0; offset < imgHeight; offset += pageHeight) {
+        if (offset > 0) pdf.addPage();
+        pdf.addImage(
+          imgData,
+          "PNG",
+          10,
+          position - offset,
+          imgWidth,
+          imgHeight
+        );
+      }
+
+      pdf.save("Custom-Course-Flowchart.pdf");
+
+      // After generating the PDF reshow delete buttons
+      document
+        .querySelectorAll(".delete-button")
+        .forEach((btn) => btn.classList.remove("hidden-in-pdf"));
+    });
+  });
