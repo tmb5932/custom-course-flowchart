@@ -13,9 +13,7 @@
     <!-- NOT IMPLEMENTED HELP OVERLAY YET!!!!!-->
 
     <!-- PLAN TO DO!!! -->
-    <!-- SCRAPE DATA ABOUT COURSES FROM THE https://schedulemaker.csh.rit.edu/browse webpage! -->
-    <!-- ADD BUTTONS TO CHANGE SCALE OF EVERYTHING (SMALL, NORMAL, LARGE). SO PEOPLE CAN SEE LIKE 6 SEMESTERS AT SAME TIME INSTEAD OF ONLY 2 -->
-    <!-- OR ADD A VIEW BUTTON THAT CONDENSES THE INFO INTO SOMETHING LIKE THE RIT GIVEN PDF's -->
+    <!-- ADD A VIEW BUTTON THAT CONDENSES THE INFO INTO SOMETHING LIKE THE RIT GIVEN PDF's -->
     <!-- Move the create semester and create course buttons to a nav bar that is always on screen -->
     <!-- Add option to choose color of semester/course when creating it -->
 
@@ -56,6 +54,22 @@
           <option value="Winter Only">Winter Only</option>
           <option value="Spring Only">Spring Only</option>
           <option value="Summer Only">Summer Only</option>
+        </select>
+        <div id="course-color-preview" class="color-preview">
+          <h3>Color</h3>
+        </div>
+        <select
+          id="course-color"
+          class="dropdown-menu"
+          onchange="updateColorPreview('course-color', 'course-color-preview')"
+        >
+          <option value="lightcoral">Light Red</option>
+          <option value="lightsalmon">Light Orange</option>
+          <option value="lightblue">Light Blue</option>
+          <option value="plum">Light Purple</option>
+          <option value="white">White</option>
+          <option value="lightgreen">Green</option>
+          <option value="lightpink">Light Pink</option>
         </select>
         <button id="confirm-course-button" class="confirm-button">
           Confirm

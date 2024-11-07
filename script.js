@@ -190,9 +190,8 @@ newCourseButton.onclick = function () {
   courseOverlay.style.display = "flex";
   document.getElementById("new-course-name").value = ""; // Reset to empty
   document.getElementById("semester-restrictions").value = "Any"; // Reset to default
-
-  // Focus on the input field
-  document.getElementById("new-course-name").focus();
+  updateColorPreview("course-color", "course-color-preview"); // Update preview
+  document.getElementById("new-course-name").focus(); // Focus on the input field
 };
 
 closeCourseOverlayButton.onclick = function () {
@@ -206,6 +205,7 @@ confirmCourseButton.onclick = function () {
   }
   var courseName = document.getElementById("new-course-name").value;
   var semRestrictions = document.getElementById("semester-restrictions").value;
+  var courseColor = document.getElementById("course-color").value;
 
   // Only create a new semester if the user enters a valid name and selects a type
   if (
@@ -223,6 +223,9 @@ confirmCourseButton.onclick = function () {
     } else {
       newCourse.innerHTML = "<h2>" + courseName + "<h2>";
     }
+
+    // Set color
+    newCourse.style.backgroundColor = courseColor;
 
     // Create a delete button for the course
     var deleteButton = document.createElement("button");
@@ -323,3 +326,9 @@ window.onclick = function (event) {
     courseOverlay.style.display = "none";
   }
 };
+
+function updateColorPreview(colorSelectorId, previewId) {
+  const colorValue = document.getElementById(colorSelectorId).value;
+  const previewElement = document.getElementById(previewId);
+  previewElement.style.backgroundColor = colorValue;
+}

@@ -69,6 +69,19 @@ body {
   min-height: 200px;
 }
 
+.color-preview {
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  width: 80px;
+  height: 35px;
+  border-radius: 5px;
+  border: 1px solid #000;
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .course {
   display: grid;
   background-color: rgb(93, 93, 93);
