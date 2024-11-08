@@ -283,9 +283,9 @@ h2 {
 }
 
 .semester-box.locked .lock-button {
-  background-color: rgb(75, 75, 75);
+  background-color: rgba(75, 75, 75, 0.5);
 }
 
 .semester-box:not(.locked) .lock-button {
-  background-color: rgba(75, 75, 75, 0.5);
+  background-color: rgb(75, 75, 75);
 }
