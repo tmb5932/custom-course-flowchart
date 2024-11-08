@@ -319,6 +319,18 @@ confirmSemButton.onclick = function () {
     var newSemester = document.createElement("div");
     newSemester.className = "semester-box";
 
+    newSemester.setAttribute("restriction", semesterType);
+
+    if (semesterType === "Coop") {
+      newSemester.classList.add("coop-semester"); // Add class for special Coop styling
+      newSemester.innerHTML = `<h2 contenteditable="true">${semesterName}</h2>`;
+    } else {
+      newSemester.innerHTML =
+        '<h2 contenteditable="true">' +
+        semesterName +
+        '</h2><div class="course-box" ondrop="drop(event)" ondragover="allowDrop(event); dragOverCourse(event)"></div>';
+    }
+
     // Create a delete button for the semester
     var deleteSemButton = document.createElement("button");
     deleteSemButton.textContent = "Delete Semester";
@@ -333,13 +345,6 @@ confirmSemButton.onclick = function () {
     lockSemButton.onclick = function () {
       lockSemester(this);
     };
-
-    newSemester.setAttribute("restriction", semesterType);
-
-    newSemester.innerHTML =
-      '<h2 contenteditable="true">' +
-      semesterName +
-      '</h2><div class="course-box" ondrop="drop(event)" ondragover="allowDrop(event); dragOverCourse(event)"></div>';
 
     newSemester.appendChild(deleteSemButton);
     newSemester.appendChild(lockSemButton);
@@ -420,9 +425,13 @@ document
       // Insta save, no open
       // pdf.save("Custom-Course-Flowchart.pdf");
 
-      // Re-show delete buttons
+      // Re-show buttons
       document
         .querySelectorAll(".delete-button")
+        .forEach((btn) => btn.classList.remove("hidden-in-pdf"));
+
+      document
+        .querySelectorAll(".lock-button")
         .forEach((btn) => btn.classList.remove("hidden-in-pdf"));
     });
   });
@@ -433,17 +442,25 @@ function saveFlowchart() {
   document.querySelectorAll(".semester-box").forEach((semester) => {
     const semesterName = semester.querySelector("h2").textContent.trim();
     const semesterType = semester.getAttribute("restriction");
+    const isLocked = semester.getAttribute("locked") === "true";
     const courses = [];
 
-    semester.querySelectorAll(".course").forEach((course) => {
-      courses.push({
-        name: course.querySelector("h2").textContent.trim(),
-        restriction: course.getAttribute("restriction"),
-        color: course.style.backgroundColor,
+    if (semesterType !== "Coop") {
+      semester.querySelectorAll(".course").forEach((course) => {
+        courses.push({
+          name: course.querySelector("h2").textContent.trim(),
+          restriction: course.getAttribute("restriction"),
+          color: course.style.backgroundColor,
+        });
       });
-    });
+    }
 
-    semesters.push({ name: semesterName, type: semesterType, courses });
+    semesters.push({
+      name: semesterName,
+      type: semesterType,
+      isLocked: isLocked,
+      courses,
+    });
   });
 
   localStorage.setItem("flowchartData", JSON.stringify(semesters));
@@ -462,6 +479,7 @@ function loadFlowchart() {
   const scheduleContainer = document.getElementById("schedule-container");
   scheduleContainer.innerHTML = ""; // Clears current schedule
 
+  var uniqID = 0;
   semesters.forEach((semesterData) => {
     const newSemester = document.createElement("div");
     newSemester.className = "semester-box";
@@ -480,6 +498,7 @@ function loadFlowchart() {
       newCourse.style.backgroundColor = courseData.color;
       newCourse.setAttribute("restriction", courseData.restriction);
       newCourse.setAttribute("draggable", true);
+      newCourse.setAttribute("id", "course-" + uniqID++);
       newCourse.setAttribute("ondragstart", "drag(event)");
 
       const deleteButton = document.createElement("button");
@@ -500,7 +519,26 @@ function loadFlowchart() {
       newSemester.remove();
     };
 
+    var lockSemButton = document.createElement("button");
+    lockSemButton.textContent = semesterData.isLocked ? "Unlock" : "Lock";
+    lockSemButton.className = "lock-button";
+    lockSemButton.style.backgroundColor = semesterData.isLocked
+      ? "rgba(75, 75, 75, 0.5)"
+      : "grey";
+    lockSemButton.onclick = function () {
+      if (newSemester.getAttribute("locked") === "true") {
+        newSemester.removeAttribute("locked");
+        lockSemButton.textContent = "Lock";
+        lockSemButton.style.backgroundColor = "grey";
+      } else {
+        newSemester.setAttribute("locked", "true");
+        lockSemButton.textContent = "Unlock";
+        lockSemButton.style.backgroundColor = "rgba(75, 75, 75, 0.5)";
+      }
+    };
+
     newSemester.appendChild(deleteSemButton);
+    newSemester.appendChild(lockSemButton);
     scheduleContainer.appendChild(newSemester);
   });
 
@@ -511,6 +549,7 @@ function lockSemester(button) {
   const semesterBox = button.parentNode;
   semesterBox.classList.add("locked");
   button.textContent = "Unlock";
+  button.color = "75, 75, 75, 0.5";
   button.setAttribute("onclick", "unlockSemester(this)");
 }
 
@@ -518,6 +557,6 @@ function unlockSemester(button) {
   const semesterBox = button.parentNode;
   semesterBox.classList.remove("locked");
   button.textContent = "Lock";
-  button.color = "rgba(255, 0, 0, 0.3)";
+  button.color = "grey";
   button.setAttribute("onclick", "lockSemester(this)");
 }
