@@ -179,7 +179,7 @@ function attachDragEndListeners() {
 // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
 // Add Course Section
-var uniqueId = 0;
+let uniqueId = 0;
 
 var courseOverlay = document.getElementById("course-overlay");
 var newCourseButton = document.getElementById("new-course-button");
@@ -383,7 +383,7 @@ document
     const container = document.getElementById("schedule-container");
 
     html2canvas(container, {
-      scale: 2, // High resolution for better quality
+      scale: 2,
     }).then((canvas) => {
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jspdf.jsPDF("p", "mm", "a4");
@@ -407,15 +407,7 @@ document
       pdf.setFontSize(12);
       pdf.text(`Date: ${date}`, pdfWidth / 2, 18, { align: "center" });
 
-      // Add image content (scaled appropriately)
-      pdf.addImage(
-        imgData,
-        "PNG",
-        10,
-        25, // Below title
-        imgWidth,
-        scaledImgHeight
-      );
+      pdf.addImage(imgData, "PNG", 10, 25, imgWidth, scaledImgHeight);
 
       // Open the PDF in a new tab
       const pdfBlob = pdf.output("blob");
@@ -479,7 +471,7 @@ function loadFlowchart() {
   const scheduleContainer = document.getElementById("schedule-container");
   scheduleContainer.innerHTML = ""; // Clears current schedule
 
-  var uniqID = 0;
+  this.uniqueId = 0;
   semesters.forEach((semesterData) => {
     const newSemester = document.createElement("div");
     newSemester.className = "semester-box";
@@ -498,7 +490,7 @@ function loadFlowchart() {
       newCourse.style.backgroundColor = courseData.color;
       newCourse.setAttribute("restriction", courseData.restriction);
       newCourse.setAttribute("draggable", true);
-      newCourse.setAttribute("id", "course-" + uniqID++);
+      newCourse.setAttribute("id", "course-" + uniqueId++);
       newCourse.setAttribute("ondragstart", "drag(event)");
 
       const deleteButton = document.createElement("button");
@@ -525,17 +517,17 @@ function loadFlowchart() {
     lockSemButton.style.backgroundColor = semesterData.isLocked
       ? "rgba(75, 75, 75, 0.5)"
       : "grey";
-    lockSemButton.onclick = function () {
-      if (newSemester.getAttribute("locked") === "true") {
-        newSemester.removeAttribute("locked");
-        lockSemButton.textContent = "Lock";
-        lockSemButton.style.backgroundColor = "grey";
-      } else {
-        newSemester.setAttribute("locked", "true");
-        lockSemButton.textContent = "Unlock";
-        lockSemButton.style.backgroundColor = "rgba(75, 75, 75, 0.5)";
-      }
-    };
+
+    if (semesterData.isLocked == "true") {
+      newSemester.setAttribute("locked");
+      lockSemButton.onclick = function () {
+        unlockSemester(lockSemButton);
+      };
+    } else {
+      lockSemButton.onclick = function () {
+        lockSemester(lockSemButton);
+      };
+    }
 
     newSemester.appendChild(deleteSemButton);
     newSemester.appendChild(lockSemButton);
