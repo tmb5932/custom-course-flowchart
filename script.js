@@ -354,15 +354,6 @@ confirmSemButton.onclick = function () {
   }
 };
 
-// Close either overlay if the user clicks off it
-window.onclick = function (event) {
-  if (event.target === semOverlay) {
-    semOverlay.style.display = "none";
-  } else if (event.target === courseOverlay) {
-    courseOverlay.style.display = "none";
-  }
-};
-
 function updateColorPreview(colorSelectorId, previewId) {
   const colorValue = document.getElementById(colorSelectorId).value;
   const previewElement = document.getElementById(previewId);
@@ -545,3 +536,34 @@ function unlockSemester(button) {
   button.color = "grey";
   button.setAttribute("onclick", "lockSemester(this)");
 }
+
+// Help Modal
+var helpOverlay = document.getElementById("help-overlay");
+var helpButton = document.getElementById("help-button");
+var helpCloseButton = document.getElementById("help-close");
+var closeHelpButton = document.getElementById("close-help-button");
+
+// Open the Help Modal
+helpButton.onclick = function () {
+  helpOverlay.style.display = "flex";
+};
+
+// Close the Help Modal
+helpCloseButton.onclick = function () {
+  helpOverlay.style.display = "none";
+};
+
+closeHelpButton.onclick = function () {
+  helpOverlay.style.display = "none";
+};
+
+// Close any modal if the user clicks off it
+window.onclick = function (event) {
+  if (event.target === semOverlay) {
+    semOverlay.style.display = "none";
+  } else if (event.target === courseOverlay) {
+    courseOverlay.style.display = "none";
+  } else if (event.target === helpOverlay) {
+    helpOverlay.style.display = "none";
+  }
+};
