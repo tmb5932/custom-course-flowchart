@@ -434,7 +434,7 @@ function saveFlowchart() {
   document.querySelectorAll(".semester-box").forEach((semester) => {
     const semesterName = semester.querySelector("h2").textContent.trim();
     const semesterType = semester.getAttribute("restriction");
-    const isLocked = semester.getAttribute("locked") === "true";
+    const isLocked = semester.classList.contains("locked");
     const courses = [];
 
     if (semesterType !== "Coop") {
@@ -514,19 +514,12 @@ function loadFlowchart() {
     var lockSemButton = document.createElement("button");
     lockSemButton.textContent = semesterData.isLocked ? "Unlock" : "Lock";
     lockSemButton.className = "lock-button";
-    lockSemButton.style.backgroundColor = semesterData.isLocked
-      ? "rgba(75, 75, 75, 0.5)"
-      : "grey";
 
-    if (semesterData.isLocked == "true") {
-      newSemester.setAttribute("locked");
-      lockSemButton.onclick = function () {
-        unlockSemester(lockSemButton);
-      };
+    if (semesterData.isLocked) {
+      newSemester.classList.add("locked");
+      lockSemButton.setAttribute("onclick", "unlockSemester(this)");
     } else {
-      lockSemButton.onclick = function () {
-        lockSemester(lockSemButton);
-      };
+      lockSemButton.setAttribute("onclick", "lockSemester(this)");
     }
 
     newSemester.appendChild(deleteSemButton);
