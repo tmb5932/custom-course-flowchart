@@ -559,11 +559,15 @@ closeHelpButton.onclick = function () {
 
 // Close any modal if the user clicks off it
 window.onclick = function (event) {
-  if (event.target === semOverlay) {
-    semOverlay.style.display = "none";
-  } else if (event.target === courseOverlay) {
-    courseOverlay.style.display = "none";
-  } else if (event.target === helpOverlay) {
-    helpOverlay.style.display = "none";
+  switch (event.target) {
+    case semOverlay: {
+      semOverlay.style.display = "none";
+    }
+    case courseOverlay: {
+      courseOverlay.style.display = "none";
+    }
+    case helpOverlay: {
+      helpOverlay.style.display = "none";
+    }
   }
 };
