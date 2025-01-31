@@ -98,7 +98,7 @@ function drop(event) {
       alert(
         "This course is a '" +
           draggedCourse.getAttribute("restriction") +
-          "' when the semester is '" +
+          "' while the semester is '" +
           event.target.parentNode.parentNode.getAttribute("restriction") +
           "'!"
       );
@@ -209,7 +209,7 @@ confirmCourseButton.onclick = function () {
 
   const courseNameError = document.getElementById("course-name-error");
 
-  if (courseName === "" || (courseName != null && courseName.trim() == "")) {
+  if (courseName === "" || (courseName != null && courseName.trim() === "")) {
     courseNameError.textContent = "A course name is required.";
     courseNameError.style.display = "block"; // Show Error
     return;
@@ -301,7 +301,7 @@ confirmSemButton.onclick = function () {
 
   if (
     semesterName === "" ||
-    (semesterName != null && semesterName.trim() == "")
+    (semesterName != null && semesterName.trim() === "")
   ) {
     semesterNameError.textContent = "A semester name is required.";
     semesterNameError.style.display = "block"; // Show error
@@ -354,6 +354,7 @@ confirmSemButton.onclick = function () {
   }
 };
 
+// Colors in
 function updateColorPreview(colorSelectorId, previewId) {
   const colorValue = document.getElementById(colorSelectorId).value;
   const previewElement = document.getElementById(previewId);
@@ -419,7 +420,7 @@ document
     });
   });
 
-// Saves the current flowchart to local storage
+// Saves the current flowchart to backend database
 async function saveFlowchart() {
   const username = prompt("Enter your username:");
   if (!username || !username.trim()) {
@@ -427,6 +428,7 @@ async function saveFlowchart() {
     return;
   }
 
+  // Get each semester with its attributes and courses
   const semesters = [];
   document.querySelectorAll(".semester-box").forEach((semester) => {
     const semesterName = semester.querySelector("h2").textContent.trim();
@@ -453,6 +455,7 @@ async function saveFlowchart() {
   });
 
   try {
+    // Send data to backend
     const response = await fetch("/save_flowchart", {
       method: "POST",
       headers: {
@@ -469,7 +472,7 @@ async function saveFlowchart() {
   }
 }
 
-// Loads saved flowchart from local storage
+// Retrieves and loads data from backend
 async function loadFlowchart() {
   const username = prompt("Enter your username to load your flowchart:").trim();
   if (!username) {
@@ -488,12 +491,13 @@ async function loadFlowchart() {
     }
 
     const data = await response.json();
-    console.log("Loaded flowchart:", data); // Debugging
 
     const scheduleContainer = document.getElementById("schedule-container");
     scheduleContainer.innerHTML = ""; // Clears current schedule
 
     this.uniqueId = 0;
+
+    // Populates semesters
     data.semesters.forEach((semesterData) => {
       const newSemester = document.createElement("div");
       newSemester.className = "semester-box";
@@ -510,6 +514,7 @@ async function loadFlowchart() {
 
       const courseBox = newSemester.querySelector(".course-box");
 
+      // Populates courses in the semester
       semesterData.courses.forEach((courseData) => {
         const newCourse = document.createElement("div");
         newCourse.className = "course";
@@ -561,6 +566,7 @@ async function loadFlowchart() {
   alert("Flowchart loaded successfully!");
 }
 
+// Locks semester from courses being auto-placed
 function lockSemester(button) {
   const semesterBox = button.parentNode;
   semesterBox.classList.add("locked");
@@ -569,6 +575,7 @@ function lockSemester(button) {
   button.setAttribute("onclick", "unlockSemester(this)");
 }
 
+// Unlocks semester, allowing courses to be auto-placed
 function unlockSemester(button) {
   const semesterBox = button.parentNode;
   semesterBox.classList.remove("locked");
@@ -593,6 +600,7 @@ helpCloseButton.onclick = function () {
   helpOverlay.style.display = "none";
 };
 
+// Close the Help Modal (don't ask why I made 2 close buttons...)
 closeHelpButton.onclick = function () {
   helpOverlay.style.display = "none";
 };
@@ -602,14 +610,15 @@ window.onclick = function (event) {
   switch (event.target) {
     case semOverlay: {
       semOverlay.style.display = "none";
+      break;
     }
     case courseOverlay: {
       courseOverlay.style.display = "none";
+      break;
     }
     case helpOverlay: {
       helpOverlay.style.display = "none";
+      break;
     }
   }
 };
-
-document.addEventListener("DOMContentLoaded", loadFlowchart);

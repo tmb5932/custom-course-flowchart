@@ -9,10 +9,12 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
+# User table in database; User(id, username)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
 
+# Semester table in database; Semester(id, user_id, name, type, is_locked)
 class Semester(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
@@ -20,16 +22,20 @@ class Semester(db.Model):
     type = db.Column(db.String(50), nullable=False)
     is_locked = db.Column(db.Boolean, default=False)
 
+# Course table in database; Course(id, semester_id, name, restriction, color)
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     semester_id = db.Column(db.Integer, db.ForeignKey("semester.id"), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     restriction = db.Column(db.String(50))
     color = db.Column(db.String(20))
+
+# Routing for webpage html
 @app.route("/")
 def index():
     return render_template("index.html")
 
+# Save flowchart request
 @app.route("/save_flowchart", methods=["POST"])
 def save_flowchart():
     data = request.json
@@ -42,7 +48,7 @@ def save_flowchart():
     user = User.query.filter_by(username=username).first()
     if not user:
         user = User(username=username)
-        db.session.add(user)
+        db.session.add(user) # create new user account
         db.session.commit()
 
     # Clear previous flowchart data for the user
@@ -53,6 +59,7 @@ def save_flowchart():
     Semester.query.filter_by(user_id=user.id).delete()
     db.session.commit()
 
+    # Save new semester & course data
     for sem in semesters_data:
         new_semester = Semester(user_id=user.id, name=sem["name"], type=sem["type"], is_locked=sem["isLocked"])
         db.session.add(new_semester)
@@ -70,15 +77,18 @@ def save_flowchart():
     db.session.commit()
     return jsonify({"message": "Flowchart saved successfully!"}), 200
 
+# Retrieve flowchart request
 @app.route("/get_flowchart/<username>", methods=["GET"])
 def get_flowchart(username):
     user = User.query.filter_by(username=username).first()
     if not user:
         return jsonify({"message": "User not found."}), 404
 
+    # Find all existing semesters
     semesters = Semester.query.filter_by(user_id=user.id).all()
     flowchart_data = []
 
+    # Add the semesters and their courses to the data
     for semester in semesters:
         courses = Course.query.filter_by(semester_id=semester.id).all()
         flowchart_data.append({
@@ -90,6 +100,7 @@ def get_flowchart(username):
 
     return jsonify({"username": username, "semesters": flowchart_data})
 
+# Create the database tables
 with app.app_context():
     db.create_all()
 
