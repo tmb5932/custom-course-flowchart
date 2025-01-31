@@ -1,6 +1,6 @@
 # Custom Course Flowchart
 Website that lets you plan which semesters to take your future courses needed to finish your degree.
-Made using HTML, CSS, and JavaScript.
+Made using HTML, CSS, and JavaScript frontend, and Python Flask and SQLite backend.
 
 ## Features
 #### Drag-and-Drop Functionality
@@ -14,9 +14,9 @@ Made using HTML, CSS, and JavaScript.
 -	Delete courses with a single click.
 #### Dynamic Semester Creation
 -	Add new semesters with custom names and types (e.g., Fall, Spring, Winter, Summer).
--	Lock or unlock semesters to prevent or allow modifications.
+-	Lock or unlock semesters to prevent or allow auto placement of new courses.
 #### Save and Load Flowcharts
--	Save your custom course flowchart to browser storage for later use.
+-	Save your custom course flowchart to SQLite database for later access.
 -	Reload saved flowcharts with all semesters, courses, and configurations intact.
 #### PDF Export
 -	Generate a high-quality PDF of your flowchart for printing or sharing.
